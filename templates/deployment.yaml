@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "default-app.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "default-app.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "default-app.name" . }}
+    spec:
+      serviceAccountName: {{ include "default-app.serviceAccountName" . }}
+      securityContext:
+{{ toYaml .Values.podSecurityContext | indent 8 }}
+      topologySpreadConstraints:
+      {{- if .Values.topologySpreadConstraints.enabled }}
+      - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
+        topologyKey: {{ .Values.topologySpreadConstraints.topologyKey }}
+        whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable }}
+        labelSelector:
+          matchLabels:
+            app: {{ include "default-app.name" . }}
+      {{- end }}
+      containers:
+      - name: app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+{{ toYaml .Values.securityContext | indent 10 }}
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+        envFrom:
+        - secretRef:
+            name: {{ include "default-app.fullname" . }}-secret
+        {{- if .Values.configMap.enabled }}
+        - configMapRef:
+            name: {{ include "default-app.fullname" . }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
