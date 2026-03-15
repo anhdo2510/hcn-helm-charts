@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: acrhcndev001.azurecr.io
-  CHART_PATH: hcn-helm-charts
+  CHART_PATH: charts/default-app
   CHART_NAME: default-app
 
 jobs:
@@ -43,8 +43,7 @@ jobs:
 
     - name: Package Helm chart
       run: |
-        cd ${{ env.CHART_PATH }}
-        helm package .
+        helm package ${{ env.CHART_PATH }}
 
     - name: Push Helm chart to ACR
       run: |
