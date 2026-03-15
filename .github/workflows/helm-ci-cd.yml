@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  REGISTRY: youracr.azurecr.io
+  REGISTRY: acrhcndev001.azurecr.io
   CHART_PATH: hcn-helm-charts
   CHART_NAME: default-app
 
@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: main  # Ensure building from main branch
 
     - name: Extract version from tag
       id: version
