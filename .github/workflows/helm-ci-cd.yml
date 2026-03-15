@@ -2,20 +2,13 @@ name: Package and Push Helm Chart to ACR
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'hcn-helm-charts/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'hcn-helm-charts/**'
+    tags:
+      - 'v*'
 
 env:
   REGISTRY: youracr.azurecr.io
   CHART_PATH: hcn-helm-charts
-  CHART_NAME: hcn-helm-charts
+  CHART_NAME: default-app
 
 jobs:
   package-and-push:
@@ -25,11 +18,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Extract version from tag
+      id: version
+      run: |
+        TAG=${{ github.ref_name }}
+        VERSION=${TAG#v}  # Remove 'v' prefix
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
     - name: Install Helm
       run: |
         curl https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz -o helm.tar.gz
         tar -zxvf helm.tar.gz
         sudo mv linux-amd64/helm /usr/local/bin/helm
+
+    - name: Update Chart version
+      run: |
+        sed -i "s/version: .*/version: ${{ steps.version.outputs.version }}/" ${{ env.CHART_PATH }}/Chart.yaml
 
     - name: Log in to Azure Container Registry
       run: |
@@ -42,4 +46,4 @@ jobs:
 
     - name: Push Helm chart to ACR
       run: |
-        helm push ${{ env.CHART_NAME }}-*.tgz oci://${{ env.REGISTRY }}/helm/
+        helm push ${{ env.CHART_NAME }}-${{ steps.version.outputs.version }}.tgz oci://${{ env.REGISTRY }}/helm/
