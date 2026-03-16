@@ -72,3 +72,6 @@ keyVault:
   enabled: false
   secretStore: azure-keyvault
   secrets: []
+
+# Environment variables for pod
+env: []

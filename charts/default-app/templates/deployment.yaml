@@ -39,5 +39,10 @@ spec:
         - configMapRef:
             name: {{ include "default-app.fullname" . }}
         {{- end }}
+        env:
+        {{- range .Values.env }}
+        - name: {{ .name }}
+          value: "{{ .value }}"
+        {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
