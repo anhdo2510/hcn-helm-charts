@@ -14,7 +14,7 @@ spec:
     spec:
       serviceAccountName: {{ include "default-app.serviceAccountName" . }}
       securityContext:
-{{ toYaml .Values.podSecurityContext | indent 8 }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       topologySpreadConstraints:
       {{- if .Values.topologySpreadConstraints.enabled }}
       - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
@@ -29,7 +29,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
-{{ toYaml .Values.securityContext | indent 10 }}
+          {{- toYaml .Values.securityContext | nindent 10 }}
         ports:
         - containerPort: {{ .Values.service.targetPort }}
         envFrom:
@@ -45,4 +45,4 @@ spec:
           value: "{{ .value }}"
         {{- end }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}
