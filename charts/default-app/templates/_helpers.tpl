@@ -10,6 +10,6 @@
 {{- if .Values.serviceAccount.name -}}
 {{- .Values.serviceAccount.name -}}
 {{- else -}}
-{{- include "default-app.fullname" . -}}
+{{- printf "%s-%s" .Release.Namespace (include "default-app.name" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end }}
