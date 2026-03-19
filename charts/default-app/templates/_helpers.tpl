@@ -7,9 +7,9 @@
 {{- end }}
 
 {{- define "default-app.serviceAccountName" -}}
-{{- if .Values.serviceAccount.name }}
-{{ .Values.serviceAccount.name }}
-{{- else }}
-{{ include "default-app.fullname" . }}
-{{- end }}
+{{- if .Values.serviceAccount.name -}}
+{{- .Values.serviceAccount.name -}}
+{{- else -}}
+{{- include "default-app.fullname" . -}}
+{{- end -}}
 {{- end }}
