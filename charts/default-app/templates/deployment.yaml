@@ -33,8 +33,10 @@ spec:
         ports:
         - containerPort: {{ .Values.service.targetPort }}
         envFrom:
+        {{- if .Values.keyVault.enabled }}
         - secretRef:
             name: {{ include "default-app.fullname" . }}-secret
+        {{- end }}
         {{- if .Values.configMap.enabled }}
         - configMapRef:
             name: {{ include "default-app.fullname" . }}
