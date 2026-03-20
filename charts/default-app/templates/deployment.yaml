@@ -57,6 +57,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: {{ .Values.configMap.mountPath }}
+          subPath: {{ .Values.configMap.fileName }}
           readOnly: true
         {{- end }}
 
