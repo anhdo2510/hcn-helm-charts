@@ -15,6 +15,7 @@ spec:
       serviceAccountName: {{ include "default-app.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
       topologySpreadConstraints:
       {{- if .Values.topologySpreadConstraints.enabled }}
       - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
@@ -24,14 +25,18 @@ spec:
           matchLabels:
             app: {{ include "default-app.name" . }}
       {{- end }}
+
       containers:
       - name: app
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+
         securityContext:
           {{- toYaml .Values.securityContext | nindent 10 }}
+
         ports:
         - containerPort: {{ .Values.service.targetPort }}
+
         envFrom:
         {{- if .Values.keyVault.enabled }}
         - secretRef:
@@ -41,10 +46,26 @@ spec:
         - configMapRef:
             name: {{ include "default-app.fullname" . }}
         {{- end }}
+
         env:
         {{- range .Values.env }}
         - name: {{ .name }}
           value: "{{ .value }}"
         {{- end }}
+
+        {{- if .Values.configMap.enabled }}
+        volumeMounts:
+        - name: config
+          mountPath: {{ .Values.configMap.mountPath }}
+          readOnly: true
+        {{- end }}
+
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+
+      {{- if .Values.configMap.enabled }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "default-app.fullname" . }}
+      {{- end }}
